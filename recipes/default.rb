@@ -55,3 +55,29 @@ bash "strongloop-node" do
   not_if "#{exists}"
   action :run
 end
+
+home_dir = ::File.join("/home", node['strongloop']['username'])
+
+bash "strongloop_webapp" do
+  cwd home_dir
+  code <<-EOH
+    slnode create web my-app
+    chown -R #{node['strongloop']['username']}: #{home_dir}/my-app
+  EOH
+  not_if {File.exists?(home_dir + "/my-app")}
+end
+
+include_recipe "supervisor"
+
+supervisor_service "my-app" do
+  action :enable
+  autostart true
+  autorestart true
+  user node['strongloop']['username']
+  command "slnode run #{home_dir}/my-app/app.js"
+  stopsignal "INT"
+  stopasgroup true
+  killasgroup true
+  stopwaitsecs 20
+  directory "#{home_dir}/my-app" 
+end
