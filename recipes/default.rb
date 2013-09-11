@@ -61,23 +61,23 @@ home_dir = ::File.join("/home", node['strongloop']['username'])
 bash "strongloop_webapp" do
   cwd home_dir
   code <<-EOH
-    slnode create web my-app
-    chown -R #{node['strongloop']['username']}: #{home_dir}/my-app
+    slnode create web #{node['strongloop']['app-name']}
+    chown -R #{node['strongloop']['username']}: #{home_dir}/#{node['strongloop']['app-name']}
   EOH
-  not_if {File.exists?(home_dir + "/my-app")}
+  not_if {File.exists?(home_dir + "/#{node['strongloop']['app-name']}")}
 end
 
 include_recipe "supervisor"
 
-supervisor_service "my-app" do
+supervisor_service "strongloop" do
   action :enable
   autostart true
   autorestart true
   user node['strongloop']['username']
-  command "slnode run #{home_dir}/my-app/app.js"
+  command "slnode run #{home_dir}/#{node['strongloop']['app-name']}/app.js"
   stopsignal "INT"
   stopasgroup true
   killasgroup true
   stopwaitsecs 20
-  directory "#{home_dir}/my-app" 
+  directory "#{home_dir}/#{node['strongloop']['app-name']}" 
 end
