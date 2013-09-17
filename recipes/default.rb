@@ -61,7 +61,14 @@ home_dir = ::File.join("/home", node['strongloop']['username'])
 bash "strongloop_webapp" do
   cwd home_dir
   code <<-EOH
-    slnode create web #{node['strongloop']['app_name']}
+    slc lb project #{node['strongloop']['app_name']}
+    cd #{node['strongloop']['app_name']}
+    slc install strong-cluster-control
+    slc install strong-agent
+    slc install loopback@1.0.0
+    slc lb model product
+    slc lb model customer
+    slc lb model store
     chown -R #{node['strongloop']['username']}: #{home_dir}/#{node['strongloop']['app_name']}
   EOH
   not_if {File.exists?(home_dir + "/#{node['strongloop']['app_name']}")}
@@ -74,7 +81,7 @@ supervisor_service "strongloop" do
   autostart true
   autorestart true
   user node['strongloop']['username']
-  command "slnode run #{home_dir}/#{node['strongloop']['app_name']}/app.js"
+  command "slc run #{home_dir}/#{node['strongloop']['app_name']}/app.js"
   stopsignal "INT"
   stopasgroup true
   killasgroup true

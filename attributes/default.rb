@@ -1,4 +1,4 @@
-default['strongloop']['package']['url'] = "http://strongloop.com/products/downloads/5334/u-0069"
+default['strongloop']['package']['url'] = "http://45ec19d3127bddec1c1d-e57051fde4dbc9469167f8c2a84830dc.r36.cf1.rackcdn.com/strongloop-suite_1.0.0-1_amd64.deb"
 default['strongloop']['domain'] = "example.com"
 default['strongloop']['username'] = "strongloop"
 default['strongloop']['password'] = nil
