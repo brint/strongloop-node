@@ -10,6 +10,11 @@ firewall_rule "http" do
   action :allow
 end
 
+firewall_rule "strongloop" do
+  port 3000
+  action :allow
+end
+
 if node[:strongloop][:ssl_cert] and node[:strongloop][:ssl_key]
   firewall_rule "https" do
     port 443
