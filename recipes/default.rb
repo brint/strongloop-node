@@ -34,13 +34,6 @@ user node['strongloop']['username'] do
   action :create
 end
 
-remote_file ::File.join(Chef::Config[:file_cache_path], "strongloop.package") do
-  source node['strongloop']['package']['url']
-  owner node['strongloop']['username']
-  group node['strongloop']['username']
-  mode 00644
-end
-
 home_dir = ::File.join("/home", node['strongloop']['username'])
 
 ### Setup NodeJS and NPM
