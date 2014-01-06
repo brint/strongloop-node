@@ -54,7 +54,10 @@ Vagrant.configure("2") do |config|
 
   config.ssh.max_tries = 40
   config.ssh.timeout   = 120
-  config.vm.network :forwarded_port, guest: 80, host: 3000
+  config.vm.network :forwarded_port, guest: 80, host: 3080
+  config.vm.network :forwarded_port, guest: 3000, host: 3000
+
+  config.omnibus.chef_version = :latest
 
   # The path to the Berksfile to use with Vagrant Berkshelf
   # config.berkshelf.berksfile_path = "./Berksfile"
@@ -80,6 +83,7 @@ Vagrant.configure("2") do |config|
 
     chef.run_list = [
         "recipe[build-essential]",
+        "recipe[git]",
         "recipe[strongloop::default]",
         "recipe[strongloop::nginx]"
     ]

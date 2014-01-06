@@ -34,44 +34,21 @@ user node['strongloop']['username'] do
   action :create
 end
 
-remote_file ::File.join(Chef::Config[:file_cache_path], "strongloop.package") do
-  source node['strongloop']['package']['url']
-  owner node['strongloop']['username']
-  group node['strongloop']['username']
-  mode 00644
-end
-
-bash "strongloop-node" do
-  cwd Chef::Config[:file_cache_path]
-  case node["platform_family"]
-    when "debian"
-      provider = "dpkg"
-      exists = "dpkg -L |grep strongloop"
-    when "rhel"
-      provider = "rpm"
-      exists = "rpm -qa |grep strongloop"
-    end
-  code "#{provider} -i #{::File.join(Chef::Config[:file_cache_path], 'strongloop.package')}"
-  not_if "#{exists}"
-  action :run
-end
-
 home_dir = ::File.join("/home", node['strongloop']['username'])
+
+### Setup NodeJS and NPM
+node.set[:nodejs][:version] = "0.10.22"
+node.set[:nodejs][:checksum] = "157fc58b3f1d109baefac4eb1d32ae747de5e6d55d87d0e9bec8f8dd10679e7e"
+node.set[:nodejs][:checksum_linux_x86] = "3823d08199b2c952cd85d1b89ba03d59f2782985ba8d25e040e4cfecdb679aff"
+node.set[:nodejs][:checksum_linux_x64] = "ca5bebc56830260581849c1099f00d1958b549fc59acfc0d37b1f01690e7ed6d"
+
+include_recipe "nodejs::install_from_binary"
+
+npm_package "strong-cli"
 
 bash "strongloop_webapp" do
   cwd home_dir
-  code <<-EOH
-    slc lb project #{node['strongloop']['app_name']}
-    cd #{node['strongloop']['app_name']}
-    slc install strong-cluster-control
-    slc install strong-agent
-    slc install loopback@1.0.0
-    slc lb model product
-    slc lb model customer
-    slc lb model store
-    chown -R #{node['strongloop']['username']}: #{home_dir}/#{node['strongloop']['app_name']}
-  EOH
-  not_if {File.exists?(home_dir + "/#{node['strongloop']['app_name']}")}
+  code "slc example"
 end
 
 include_recipe "supervisor"
@@ -81,10 +58,10 @@ supervisor_service "strongloop" do
   autostart true
   autorestart true
   user node['strongloop']['username']
-  command "slc run #{home_dir}/#{node['strongloop']['app_name']}/app.js"
+  command "slc run sls-sample-app"
   stopsignal "INT"
   stopasgroup true
   killasgroup true
   stopwaitsecs 20
-  directory "#{home_dir}/#{node['strongloop']['app_name']}" 
+  directory "#{home_dir}"
 end
