@@ -25,7 +25,7 @@ end
 
 chef_gem "ruby-shadow"
 
-user node['strongloop']['username'] do
+user node[:strongloop][:username] do
   supports :manage_home => true
   comment "StrongLoop User"
   shell "/bin/bash"
@@ -44,11 +44,17 @@ node.set[:nodejs][:checksum_linux_x64] = "ca5bebc56830260581849c1099f00d1958b549
 
 include_recipe "nodejs::install_from_binary"
 
-npm_package "strong-cli"
+bash "install_strong_cli" do
+  code "npm install -g strong-cli"
+end
 
 bash "strongloop_webapp" do
+  environment "HOME" => home_dir
   cwd home_dir
+  user node[:strongloop][:username]
+  group node[:strongloop][:username]
   code "slc example"
+  not_if {File.exists?("#{home_dir}/sls-sample-app")}
 end
 
 include_recipe "supervisor"
