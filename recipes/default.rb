@@ -37,10 +37,10 @@ end
 home_dir = ::File.join("/home", node['strongloop']['username'])
 
 ### Setup NodeJS and NPM
-node.set[:nodejs][:version] = "0.10.22"
-node.set[:nodejs][:checksum] = "157fc58b3f1d109baefac4eb1d32ae747de5e6d55d87d0e9bec8f8dd10679e7e"
-node.set[:nodejs][:checksum_linux_x86] = "3823d08199b2c952cd85d1b89ba03d59f2782985ba8d25e040e4cfecdb679aff"
-node.set[:nodejs][:checksum_linux_x64] = "ca5bebc56830260581849c1099f00d1958b549fc59acfc0d37b1f01690e7ed6d"
+node.set['nodejs']['version'] = '0.10.26'
+node.set['nodejs']['checksum'] = 'ef5e4ea6f2689ed7f781355012b942a2347e0299da0804a58de8e6281c4b1daa'
+node.set['nodejs']['checksum_linux_x64'] = '305bf2983c65edea6dd2c9f3669b956251af03523d31cf0a0471504fd5920aac'
+node.set['nodejs']['checksum_linux_x86'] = '8fa2d952556c8b5aa37c077e2735c972c522510facaa4df76d4244be88f4dc0f'
 
 include_recipe "nodejs::install_from_binary"
 
