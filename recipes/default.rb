@@ -86,6 +86,7 @@ supervisor_service "strongloop" do
   autorestart true
   user node['strongloop']['username']
   command "slc run #{File.basename(project_path)}"
+  environment "DB" => node['strongloop']['datasource'] if node['strongloop']['datasource']
   stopsignal "INT"
   stopasgroup true
   killasgroup true
