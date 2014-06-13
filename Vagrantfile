@@ -74,14 +74,13 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :chef_solo do |chef|
     chef.json = {
-      :build_essential => {
+      'build-essential' => {
         :compiletime => true
       }
     }
 
     chef.run_list = [
         "recipe[build-essential]",
-        "recipe[git]",
         "recipe[strongloop::default]",
         "recipe[strongloop::nginx]"
     ]

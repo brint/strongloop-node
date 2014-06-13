@@ -25,16 +25,16 @@ end
 
 chef_gem "ruby-shadow"
 
+home_dir = ::File.join("/home", node['strongloop']['username'])
+
 user node[:strongloop][:username] do
   supports :manage_home => true
   comment "StrongLoop User"
   shell "/bin/bash"
-  home "/home/#{node['strongloop']['username']}"
+  home home_dir
   password node['strongloop']['shadow_hash']
   action :create
 end
-
-home_dir = ::File.join("/home", node['strongloop']['username'])
 
 ### Setup NodeJS and NPM
 node.set['nodejs']['version'] = '0.10.26'
@@ -48,13 +48,34 @@ bash "install_strong_cli" do
   code "npm install -g strong-cli"
 end
 
+if node['strongloop']['project_name']
+  project_path = File.join(home_dir, node['strongloop']['project_name'])
+else # Install the example app
+  project_path = File.join(home_dir, 'sls-sample-app')
+end
+
 bash "strongloop_webapp" do
   environment "HOME" => home_dir
   cwd home_dir
   user node[:strongloop][:username]
   group node[:strongloop][:username]
-  code "slc example"
-  not_if {File.exists?("#{home_dir}/sls-sample-app")}
+  if node['strongloop']['project_name']
+    code "slc lb project #{node['strongloop']['project_name']}"
+  else # Install the example app
+    code "slc example"
+  end
+  not_if {File.exists?(project_path)}
+end
+
+# Install any additional dependencies
+node['strongloop']['npm_pkgs'].each do |pkg|
+  bash "Installing npm requirement: #{pkg}" do
+    environment "HOME" => home_dir
+    cwd project_path
+    user node[:strongloop][:username]
+    group node[:strongloop][:username]
+    code "npm install #{pkg} --save"
+  end
 end
 
 include_recipe "supervisor"
