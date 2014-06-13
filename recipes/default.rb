@@ -85,7 +85,7 @@ supervisor_service "strongloop" do
   autostart true
   autorestart true
   user node['strongloop']['username']
-  command "slc run sls-sample-app"
+  command "slc run #{File.basename(project_path)}"
   stopsignal "INT"
   stopasgroup true
   killasgroup true
