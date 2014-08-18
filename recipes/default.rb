@@ -51,7 +51,7 @@ end
 if node['strongloop']['project_name']
   project_path = File.join(home_dir, node['strongloop']['project_name'])
 else # Install the example app
-  project_path = File.join(home_dir, 'sls-sample-app')
+  project_path = File.join(home_dir, 'loopback-example-app')
 end
 
 bash "strongloop_webapp" do
