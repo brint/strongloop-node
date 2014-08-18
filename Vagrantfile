@@ -75,7 +75,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision :chef_solo do |chef|
     chef.json = {
       'build-essential' => {
-        :compiletime => true
+        :compile_time => true
       }
     }
 
